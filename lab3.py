@@ -30,12 +30,12 @@ def flood(graph: dict[str, list[str]], start: str, heuristics: dict[str, int]) -
     return len(visited)
 
 
-def create_heuristic_graph(graph: dict[str, list[str]], G1: str, G2: str):
+def create_heuristic_graph(graph: dict[str, list[str]], g1: str, g2: str):
 
     heuristics = dict[str, int]()
 
-    nodes_visited = flood(graph, G1, heuristics)
-    nodes_visited += flood(graph, G2, heuristics)
+    nodes_visited = flood(graph, g1, heuristics)
+    nodes_visited += flood(graph, g2, heuristics)
 
     print("visited " + str(nodes_visited) + " nodes")
 
