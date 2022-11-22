@@ -7,7 +7,7 @@
 import queue
 
 
-def flood(graph: dict[str, list[str]], start: str, heuristics: dict[str, int]):
+def flood(graph: dict[str, list[str]], start: str, heuristics: dict[str, int]) -> int:
     queue_nodes = queue.Queue[tuple[str, int]](len(graph))
     visited = set[str]()
     visited.add(start)
@@ -16,23 +16,28 @@ def flood(graph: dict[str, list[str]], start: str, heuristics: dict[str, int]):
     while not queue_nodes.empty():
         (node, distance) = queue_nodes.get()
 
-        if node in heuristics:
-            heuristics[node] = min(heuristics[node], distance)
-        else:
-            heuristics[node] = distance
+        # if node in heuristics:
+        #     heuristics[node] = min(heuristics[node], distance)
+        # else:
+
+        heuristics[node] = distance
 
         for adj in graph[node]:
-            if adj not in visited:
+            if adj not in visited and (adj not in heuristics or (adj in heuristics and distance + 1 < heuristics[adj])):
                 visited.add(adj)
                 queue_nodes.put((adj, distance + 1))
+
+    return len(visited)
 
 
 def create_heuristic_graph(graph: dict[str, list[str]], G1: str, G2: str):
 
     heuristics = dict[str, int]()
 
-    flood(graph, G1, heuristics)
-    flood(graph, G2, heuristics)
+    nodes_visited = flood(graph, G1, heuristics)
+    nodes_visited += flood(graph, G2, heuristics)
+
+    print("visited " + str(nodes_visited) + " nodes")
 
     new_graph = dict[str, tuple[int, list[str]]]()
 
