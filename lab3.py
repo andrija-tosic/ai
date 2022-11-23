@@ -1,70 +1,72 @@
-# 7. Napisati funkciju koja na osnovu zadatog neusmerenog grafa i dva zadata (ciljna) čvora G1 i G2
-# formira neusmereni graf sa heuristikom. Heuristika proizvoljnog čvora C se određuje kao
-# udaljenost čvora C do bližeg od čvorova G1 i G2. Udaljenost se određuje kao dužina najkraćeg puta
-# između dva čvora. Dužina puta se određuje kao broj potega koji čine taj put. Dozvoljeno je najviše
-# dva puta pozvati prilagođeni algoritam obilaska grafa.
-
+# 6. Napisati funkciju koja formira stablo traženja za zadati graf, zadati polazni čvor i izabrani algoritam
+# koji se koristiti za obilazak stabla. Student sam bira algoritam za koji se formira stablo traženja.
 import queue
+from typing import NamedTuple
+
+Key = str
+
+Priority = int
 
 
-def flood(graph: dict[str, list[str]], start: str, heuristics: dict[str, int]) -> int:
-    queue_nodes = queue.Queue[tuple[str, int]](len(graph))
-    visited = set[str]()
+class GraphNode(NamedTuple):
+    priority: Priority
+    adj: list[Key]
+
+
+Graph = dict[Key, GraphNode]
+
+NodeChildren = list[Key]
+
+Node = dict[Key, NodeChildren]
+
+
+def tree_from_best_first_search(graph: Graph, start: Key, end: Key) -> Node:
+    priority_queue = queue.PriorityQueue[tuple[Priority, Key]](len(graph))
+    visited = set[Key]()
+    prev_nodes = dict[Key, Key | None]()
+    prev_nodes[start] = None
     visited.add(start)
-    queue_nodes.put((start, 0))
+    priority_queue.put((graph[start].priority, start))
+    found_dest = False
 
-    while not queue_nodes.empty():
-        (node, distance) = queue_nodes.get()
+    tree = Node()
 
-        # if node in heuristics:
-        #     heuristics[node] = min(heuristics[node], distance)
-        # else:
+    while (not found_dest) and (not priority_queue.empty()):
+        priority, node_key = priority_queue.get()
 
-        heuristics[node] = distance
+        tree[node_key] = NodeChildren()
 
-        for adj in graph[node]:
-            if adj not in visited and (adj not in heuristics or (adj in heuristics and distance + 1 < heuristics[adj])):
-                visited.add(adj)
-                queue_nodes.put((adj, distance + 1))
+        for adj_key in graph[node_key].adj:
 
-    return len(visited)
+            tree[node_key].append(adj_key)
 
+            print(node_key, "->", adj_key)
 
-def create_heuristic_graph(graph: dict[str, list[str]], g1: str, g2: str):
+            if adj_key not in visited:
+                prev_nodes[adj_key] = node_key
+                if adj_key is end:
+                    found_dest = True
+                    break
+                visited.add(adj_key)
 
-    heuristics = dict[str, int]()
+                priority_queue.put((graph[adj_key].priority, adj_key))
 
-    nodes_visited = flood(graph, g1, heuristics)
-    nodes_visited += flood(graph, g2, heuristics)
-
-    print("visited " + str(nodes_visited) + " nodes")
-
-    new_graph = dict[str, tuple[int, list[str]]]()
-
-    for node in graph:
-        new_graph[node] = (heuristics[node], graph[node])
-
-    return new_graph
+    return tree
 
 
-graph_example = {
-    "A": ["B", "C"],  # G1
-    "B": ["D", "A"],  # G2
-    "C": ["D", "E", "A"],
-    "D": ["B", "F"],
-    "E": ["F", "C"],
-    "F": ["D", "E"]
+graph_simple: Graph = {
+    "A": GraphNode(9, ["B", "C"]),
+    "B": GraphNode(6, ["D", "E"]),
+    "C": GraphNode(7, ["F", "G"]),
+    "D": GraphNode(4, ["H"]),
+    "E": GraphNode(8, ["G", "I"]),
+    "F": GraphNode(3, ["J"]),
+    "G": GraphNode(4, ["J"]),
+    "H": GraphNode(4, []),
+    "I": GraphNode(3, ["J"]),
+    "J": GraphNode(0, [])
 }
 
-graph_result = create_heuristic_graph(graph_example, "A", "B")
+tree = tree_from_best_first_search(graph_simple, "A", "J")
 
-print(graph_result)
-
-graph_result_primer: dict[str, tuple[int, list[str]]] = {
-    "A": (0, ["B", "C"]),  # G1
-    "B": (0, ["D", "A"]),  # G2
-    "C": (1, ["D", "E", "A"]),
-    "D": (1, ["B", "F"]),
-    "E": (2, ["F", "C"]),
-    "F": (2, ["D", "E"])
-}
+print("Tree:", tree)
