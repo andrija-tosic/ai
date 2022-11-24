@@ -20,33 +20,28 @@ NodeChildren = list[Key]
 Node = dict[Key, NodeChildren]
 
 
-def tree_from_best_first_search(graph: Graph, start: Key, end: Key) -> Node:
+def tree_from_best_first_search(graph: Graph, start: Key) -> Node:
     priority_queue = queue.PriorityQueue[tuple[Priority, Key]](len(graph))
     visited = set[Key]()
     prev_nodes = dict[Key, Key | None]()
     prev_nodes[start] = None
     visited.add(start)
     priority_queue.put((graph[start].priority, start))
-    found_dest = False
 
     tree = Node()
 
-    while (not found_dest) and (not priority_queue.empty()):
+    while not priority_queue.empty():
         priority, node_key = priority_queue.get()
 
         tree[node_key] = NodeChildren()
 
         for adj_key in graph[node_key].adj:
 
-            tree[node_key].append(adj_key)
-
             print(node_key, "->", adj_key)
 
             if adj_key not in visited:
+                tree[node_key].append(adj_key)
                 prev_nodes[adj_key] = node_key
-                if adj_key is end:
-                    found_dest = True
-                    break
                 visited.add(adj_key)
 
                 priority_queue.put((graph[adj_key].priority, adj_key))
@@ -67,6 +62,6 @@ graph_simple: Graph = {
     "J": GraphNode(0, [])
 }
 
-tree = tree_from_best_first_search(graph_simple, "A", "J")
+result_tree = tree_from_best_first_search(graph_simple, "A")
 
-print("Tree:", tree)
+print("Tree:", result_tree)
