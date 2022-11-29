@@ -43,7 +43,7 @@ def a_star(graph, start, end):
         while prev_nodes[prev] is not None:
             path.append(prev)
             prev = prev_nodes[prev]
-            path.append(start)
+    path.append(start)
     path.reverse()
     return path
 
