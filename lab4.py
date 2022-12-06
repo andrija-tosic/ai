@@ -3,13 +3,7 @@
 # figuru na tabli samo na jedno od susednih polja u horizontalnom i vertikalnom pravcu. Odrediti
 # najkraći put od startnog do ciljnog polja. Zapamtiti put kojim se kretao igrač od starta do cilja.
 
-# svi squares oko zabranjenog treba da imaju losu heuristiku
-
-from datetime import timedelta
-import time
-from colorama import Fore, Back, Style
-from random import random
-from pprint import pprint
+from colorama import Fore,  Style
 from queue import PriorityQueue
 from typing import NamedTuple
 
