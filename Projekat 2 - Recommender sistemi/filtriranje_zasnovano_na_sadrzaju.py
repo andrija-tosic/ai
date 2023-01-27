@@ -37,7 +37,7 @@ if __name__ == '__main__':
             'jezik', 'zanr_pesme', 'godina_izdavanja']
     df.drop(columns=cols, inplace=True)
 
-    # Izračunavanje sličnosti vektora sa id-jevima knjiga u odnosu na sve ostale vektore
+    # Izračunavanje sličnosti vektora sa id-jevima pesama u odnosu na sve ostale vektore
     df.set_index('id_pesme', inplace=True)
 
     inputVec = df.loc[df.index[0]].values
